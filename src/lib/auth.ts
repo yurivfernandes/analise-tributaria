@@ -56,3 +56,32 @@ export async function signOut() {
     throw new Error('Falha ao fazer logout');
   }
 }
+
+interface UserData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  cep: string;
+  isAdmin: boolean;
+}
+
+export const auth = {
+  signUp,
+  signIn,
+  signOut,
+
+  async register(userData: UserData) {
+    // Implementar lógica de registro
+    if (userData.isAdmin) {
+      // Criar usuário admin com permissões especiais
+      console.log('Criando usuário admin');
+    }
+    // Resto da implementação
+  },
+
+  async loginWithSocial(provider: 'google' | 'github') {
+    // Implementar lógica de login social
+    console.log(`Login com ${provider}`);
+  }
+};

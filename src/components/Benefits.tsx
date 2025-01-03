@@ -25,11 +25,17 @@ const benefits = [
 
 const Benefits = () => {
   return (
-    <section className="py-12">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8">Benefícios</h2>
-        <div className="text-center">
-          <p className="text-xl">Otimize seus processos tributários</p>
+        <h2 className="text-3xl font-bold text-center mb-12">Por que escolher nossa plataforma?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {benefits.map((benefit, index) => (
+            <div key={index} className="text-center p-6 bg-gray-50 rounded-lg hover:shadow-lg transition">
+              <div className="text-4xl font-bold text-blue-600 mb-4">{benefit.metric}</div>
+              <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
+              <p className="text-gray-600">{benefit.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
