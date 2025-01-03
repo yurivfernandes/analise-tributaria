@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CNAE } from '../types/cnae';
-import { supabase } from '../lib/supabase';
 
 interface CNAEFilters {
   search: string;
@@ -23,31 +22,23 @@ export function useCNAE() {
       setLoading(true);
       setError(undefined);
 
-      let query = supabase
-        .from('cnaes')
-        .select('*')
-        .order('codigo', { ascending: true });
-
+      const queryParams = new URLSearchParams();
       if (filters.search) {
-        query = query.ilike(filters.field, `%${filters.search}%`);
+        queryParams.append('search', filters.search);
+        queryParams.append('field', filters.field);
       }
 
-      const { data, error: fetchError } = await query;
-
-      if (fetchError) throw fetchError;
-
-      setCNAEs(data || []);
+      const response = await fetch(`/api/cnaes?${queryParams}`);
+      if (!response.ok) throw new Error('Falha ao carregar CNAEs');
+      const data = await response.json();
+      
+      setCNAEs(data.cnaes || []);
       
       // Buscar última atualização
-      const { data: logData } = await supabase
-        .from('cnae_logs')
-        .select('data')
-        .eq('status', 'success')
-        .order('data', { ascending: false })
-        .limit(1);
-
-      if (logData?.[0]) {
-        setLastUpdate(logData[0].data);
+      const logResponse = await fetch('/api/cnaes/last-update');
+      if (logResponse.ok) {
+        const logData = await logResponse.json();
+        setLastUpdate(logData.lastUpdate);
       }
     } catch (err) {
       setError('Erro ao carregar CNAEs');
@@ -61,21 +52,11 @@ export function useCNAE() {
     try {
       setUpdateStatus('loading');
       
-      // Simular chamada à API externa
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Registrar log
-      const { error: logError } = await supabase
-        .from('cnae_logs')
-        .insert([
-          {
-            data: new Date().toISOString(),
-            status: 'success',
-            mensagem: 'CNAEs atualizados com sucesso'
-          }
-        ]);
+      const response = await fetch('/api/cnaes/update', {
+        method: 'POST'
+      });
 
-      if (logError) throw logError;
+      if (!response.ok) throw new Error('Falha na atualização');
 
       setUpdateStatus('success');
       fetchCNAEs();

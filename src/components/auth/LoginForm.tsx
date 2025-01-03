@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import SocialLogin from './SocialLogin';
 import { signIn } from '../../lib/auth';
 
@@ -122,9 +122,9 @@ export default function LoginForm() {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Não tem uma conta?{' '}
-          <a href="/signup" className="text-blue-600 hover:text-blue-500">
+          <Link to="/register" className="text-blue-600 hover:text-blue-500">
             Cadastre-se
-          </a>
+          </Link>
         </p>
       </div>
     </div>

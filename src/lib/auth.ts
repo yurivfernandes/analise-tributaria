@@ -1,5 +1,3 @@
-import { supabase } from './supabase';
-
 export type SignUpData = {
   email: string;
   password: string;
@@ -9,45 +7,52 @@ export type SignUpData = {
 };
 
 export async function signUp({ email, password, name, company, phone }: SignUpData) {
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        name
-      }
-    }
+  const response = await fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      password,
+      name,
+      company_name: company,
+      phone
+    })
   });
 
-  if (authError) throw authError;
+  if (!response.ok) {
+    throw new Error('Falha no cadastro');
+  }
 
-  // Create profile after successful signup
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .insert([
-      {
-        id: authData.user?.id,
-        company_name: company,
-        phone
-      }
-    ]);
-
-  if (profileError) throw profileError;
-
-  return authData;
+  return await response.json();
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      password
+    })
   });
 
-  if (error) throw error;
-  return data;
+  if (!response.ok) {
+    throw new Error('Falha no login');
+  }
+
+  return await response.json();
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  const response = await fetch('/api/auth/logout', {
+    method: 'POST'
+  });
+
+  if (!response.ok) {
+    throw new Error('Falha ao fazer logout');
+  }
 }
