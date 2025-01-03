@@ -93,34 +93,42 @@ export const Register = () => {
     e.preventDefault();
     setError('');
 
-    // Validações
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
-      setError('Campos obrigatórios não preenchidos.');
-      return;
-    }
-
-    // Validação de CEP (formato: 00000-000)
-    const cepRegex = /^\d{5}-?\d{3}$/;
-    if (!cepRegex.test(formData.cep)) {
-      setError('CEP inválido');
-      return;
-    }
-
-    // Validação de telefone (formato: (00) 00000-0000)
-    const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
-    if (!phoneRegex.test(formData.phone)) {
-      setError('Telefone inválido');
-      return;
-    }
-
     try {
-      await auth.register({
+      // Validações
+      if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
+        setError('Campos obrigatórios não preenchidos.');
+        return;
+      }
+
+      // Validação de CEP (formato: 00000-000)
+      const cepRegex = /^\d{5}-?\d{3}$/;
+      if (!cepRegex.test(formData.cep)) {
+        setError('CEP inválido');
+        return;
+      }
+
+      // Validação de telefone (formato: (00) 00000-0000)
+      const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        setError('Telefone inválido');
+        return;
+      }
+
+      const response = await auth.register({
         ...formData,
-        isAdmin: formData.email === 'admin@sistema.com' && formData.password === 'admin123'
+        isAdmin: formData.email === 'admin@sistema.com'
       });
-      navigate('/dashboard');
+
+      if (response) {
+        // Após registro bem-sucedido, redireciona para login
+        navigate('/login', { 
+          state: { 
+            message: 'Conta criada com sucesso! Por favor, faça login.' 
+          } 
+        });
+      }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Erro ao criar conta. Tente novamente.');
     }
   };
 

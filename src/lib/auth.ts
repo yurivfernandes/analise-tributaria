@@ -1,3 +1,5 @@
+import { API_ENDPOINTS } from './config';
+
 export type SignUpData = {
   email: string;
   password: string;
@@ -73,40 +75,50 @@ export const auth = {
 
   async register(userData: UserData): Promise<void> {
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(API_ENDPOINTS.register, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify({
+          email: userData.email,
+          name: userData.name,
+          password: userData.password,
+          phone_number: userData.phone.replace(/\D/g, ''), // Remove formatação
+          postal_code: userData.cep.replace(/\D/g, ''), // Remove formatação
+          is_staff: userData.isAdmin
+        }),
+        credentials: 'include'
       });
 
       if (!response.ok) {
-        throw new Error('Falha no registro');
+        const data = await response.json();
+        throw new Error(data.detail || data.message || 'Falha no registro');
       }
 
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro no registro:', error);
-      throw error;
+      throw new Error(error.message || 'Erro ao conectar com o servidor');
     }
   },
 
   async loginWithSocial(provider: 'google' | 'facebook' | 'apple'): Promise<void> {
     try {
-      const response = await fetch(`/api/auth/${provider}`, {
-        method: 'POST',
+      const response = await fetch(API_ENDPOINTS.socialLogin(provider), {
+        method: 'GET',
         credentials: 'include'
       });
 
       if (!response.ok) {
-        throw new Error(`Falha no login com ${provider}`);
+        const data = await response.json();
+        throw new Error(data.detail || `Falha no login com ${provider}`);
       }
 
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Erro no login com ${provider}:`, error);
-      throw error;
+      throw new Error(error.message || 'Erro ao conectar com o servidor');
     }
   }
 };
