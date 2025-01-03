@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -33,7 +33,7 @@ function HomePage() {
 export default function App() {
   console.log('App sendo renderizado'); // Log para debug
   return (
-    <Router>
+    <Suspense fallback={<div>Carregando...</div>}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -45,6 +45,6 @@ export default function App() {
         <Route path="/client/new" element={<ClientEditPage />} />
         <Route path="/client/:id" element={<ClientEditPage />} />
       </Routes>
-    </Router>
+    </Suspense>
   );
 }

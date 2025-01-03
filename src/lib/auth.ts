@@ -71,17 +71,42 @@ export const auth = {
   signIn,
   signOut,
 
-  async register(userData: UserData) {
-    // Implementar lógica de registro
-    if (userData.isAdmin) {
-      // Criar usuário admin com permissões especiais
-      console.log('Criando usuário admin');
+  async register(userData: UserData): Promise<void> {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha no registro');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Erro no registro:', error);
+      throw error;
     }
-    // Resto da implementação
   },
 
-  async loginWithSocial(provider: 'google' | 'github') {
-    // Implementar lógica de login social
-    console.log(`Login com ${provider}`);
+  async loginWithSocial(provider: 'google' | 'facebook' | 'apple'): Promise<void> {
+    try {
+      const response = await fetch(`/api/auth/${provider}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Falha no login com ${provider}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Erro no login com ${provider}:`, error);
+      throw error;
+    }
   }
 };
