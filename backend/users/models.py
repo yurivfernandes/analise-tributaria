@@ -20,6 +20,9 @@ class User(AbstractUser):
     username = None
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    postal_code = models.CharField(max_length=10, blank=True)
+    is_staff = models.BooleanField(default=False)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']

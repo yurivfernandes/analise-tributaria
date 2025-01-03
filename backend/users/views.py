@@ -10,13 +10,19 @@ from .serializers import UserSerializer
 def register(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.save()
-        login(request, user)
-        return Response({
-            'id': user.id,
-            'name': user.name,
-            'email': user.email
-        }, status=status.HTTP_201_CREATED)
+        try:
+            user = serializer.save()
+            login(request, user)
+            return Response({
+                'id': user.id,
+                'name': user.name,
+                'email': user.email,
+                'phone_number': user.phone_number,
+                'postal_code': user.postal_code,
+                'is_staff': user.is_staff
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
